@@ -1,10 +1,20 @@
 import { Button, Card, Form, Input, Typography } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { IUser } from "../model/User";
+import { useRef, useState } from "react";
 
 const { Text, Title, Link } = Typography;
 
 const Register = () => {
-  const onFinish = (values: any) => {
+
+    const userRef = useRef()
+    const errRef = useRef();
+
+    const [user, setUser] = useState('')
+    const [validName, setValidName] = useState(false)
+    const [userFocus, setUserFocus] = useState(false)
+
+  const onFinish = (values: IUser) => {
     console.log("Received values of form: ", values);
   };
 
@@ -25,7 +35,7 @@ const Register = () => {
             a continuación para su registro.
           </Text>
         </div>
-        <Form
+        <Form<IUser>
           name="normal_login"
           initialValues={{
             remember: true,
