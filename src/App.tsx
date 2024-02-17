@@ -7,7 +7,7 @@ import Register from "./components/Register";
 const LoginPage: React.FC = () => {
   return (
     <main className="App">
-      <Tickets />
+      <Register />
     </main>
   );
 };

@@ -1,6 +1,6 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, { AxiosInstance } from "axios";
 
-const baseURL: string | undefined = process.env.REACT_APP_DEV_URL;
+const baseURL: string | undefined = "https://localhost:7249/";
 
 if (!baseURL) {
   throw new Error("La variable de entorno REACT_APP_DEV_URL no está definida");
@@ -13,3 +13,5 @@ const axiosInstance: AxiosInstance = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+export default axiosInstance;
