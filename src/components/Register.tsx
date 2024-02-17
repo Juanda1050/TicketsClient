@@ -3,7 +3,7 @@ import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 const { Text, Title, Link } = Typography;
 
-const Login = () => {
+const Register = () => {
   const onFinish = (values: any) => {
     console.log("Received values of form: ", values);
   };
@@ -19,10 +19,10 @@ const Login = () => {
     >
       <Card style={{ width: "90%", maxWidth: "400px" }}>
         <div style={{ marginBottom: "1rem", textAlign: "center" }}>
-          <Title>Iniciar sesión</Title>
+          <Title>Registrarse</Title>
           <Text>
-            ¡Bienvenido de nuevo a Tickets API! Por favor, ingresa los detalles
-            a continuación para iniciar sesión.
+            ¡Bienvenido a Tickets API! Por favor, ingresa los detalles
+            a continuación para su registro.
           </Text>
         </div>
         <Form
@@ -63,11 +63,11 @@ const Login = () => {
           </Form.Item>
           <Form.Item style={{ marginBottom: 0 }}>
             <Button block type="primary" htmlType="submit">
-              Acceder
+              Registrarse
             </Button>
             <div style={{ marginTop: "1rem", textAlign: "center" }}>
-              <Text>¿Aún no tienes cuenta?</Text>{" "}
-              <Link href="">Registrarse</Link>
+              <Text>¿Ya tienes cuenta?</Text>{" "}
+              <Link href="">Iniciar sesión</Link>
             </div>
           </Form.Item>
         </Form>
@@ -76,4 +76,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
