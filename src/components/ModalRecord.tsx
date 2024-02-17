@@ -43,9 +43,10 @@ const ModalRecord: React.FC<ModalRecordProps> = ({
       visible={visible}
       onOk={handleOk}
       onCancel={onCancel}
-      okText={action === "view" ? "Cerrar" : "Guardar"}
-      cancelText="Cancelar"
-      okButtonProps={{ disabled: action === "view" }}
+      okText="Guardar"
+      cancelText={action === "view" ? "Cerrar" : "Cancelar"}
+      okButtonProps={{ style: { display: action === "view" ? "none" : "" } }}
+      cancelButtonProps={{ type: action === "view" ? "primary" : "default" }}
     >
       <Form form={form} layout="vertical">
         <Form.Item
