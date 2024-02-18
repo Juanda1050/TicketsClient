@@ -12,10 +12,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [authState, setAuthState] = useState<{
     token: string | null;
-    usuarioId: string | null;
-  }>({
-    token: localStorage.getItem("token"),
-    usuarioId: localStorage.getItem("usuarioId"),
+    usuarioId: string;
+  }>(() => {
+    const token = localStorage.getItem("token");
+    const usuarioId = localStorage.getItem("usuarioId") || "";
+    return { token, usuarioId };
   });
 
   const login = (token: string, usuarioId: string) => {
@@ -25,7 +26,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const logout = () => {
-    setAuthState({ token: null, usuarioId: null });
+    setAuthState({ token: null, usuarioId: "" });
     localStorage.removeItem("token");
     localStorage.removeItem("usuarioId");
   };

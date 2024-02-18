@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 export interface ITicket {
   id: number;
@@ -7,4 +7,5 @@ export interface ITicket {
   proveedor: string;
   comentario: string;
   fecha: dayjs.Dayjs;
+  usuarioCreoId: string;
 }

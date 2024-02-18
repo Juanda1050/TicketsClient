@@ -78,7 +78,6 @@ export const getAllTickets = async (date?: dayjs.Dayjs): Promise<ITicket[]> => {
   }
 };
 
-
 export const useAddTicketMutation = () => {
   const queryClient = useQueryClient();
 
@@ -109,7 +108,16 @@ export const useUpdateTicketMutation = () => {
       return response;
     },
     {
-      onSuccess: () => {
+      onSuccess: (updatedTicket) => {
+        queryClient.setQueryData<ITicket[] | undefined>(["all"], (oldData) => {
+          if (!oldData) return oldData;
+
+          const newData = oldData.map((ticket) =>
+            ticket.id === updatedTicket.id ? updatedTicket : ticket
+          );
+          return newData;
+        });
+
         queryClient.invalidateQueries("all");
       },
       onError: () => {

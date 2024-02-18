@@ -46,16 +46,19 @@ const RecordsTable: React.FC = () => {
   const addMutation = useAddTicketMutation();
   const updateMutation = useUpdateTicketMutation();
   const deleteMutation = useDeleteTicketMutation();
-
-  useEffect(() => {
-    refetch();
-  }, []);
-
   const { isLoading, data, isFetching, refetch } = useQuery(
     ["all", filterDate],
     () => getAllTickets(filterDate),
-    { enabled: filterDate !== undefined }
+    {
+      staleTime: 300000
+    }
+    // { enabled: filterDate !== undefined }
   );
+
+  useEffect(() => {
+    refetch();
+  }, [isLoading]);
+
 
   const handleNewRecord = () => {
     setModalVisible(true);
@@ -220,13 +223,6 @@ const RecordsTable: React.FC = () => {
                   value={filterDate}
                   onChange={(date) => setFilterDate(date)}
                 />
-                {/* <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  onClick={() => refetch()}
-                >
-                  Filtrar
-                </Button> */}
               </Space>
             </Col>
           </Row>
