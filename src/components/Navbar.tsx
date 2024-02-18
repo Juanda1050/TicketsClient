@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu, Dropdown, Button, message } from "antd";
+import { Dropdown, Button, message, MenuProps } from "antd";
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
 
 interface NavbarProps {
@@ -16,13 +16,14 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     console.log("click", e);
   };
 
-  const menu = (
-    <Menu onClick={handleMenuClick}>
-      <Menu.Item key="1" icon={<LogoutOutlined />} onClick={handleLogout}>
-        Cerrar sesión
-      </Menu.Item>
-    </Menu>
-  );
+  const items: MenuProps["items"] = [
+    {
+      label: "Cerrar sesión",
+      key: "1",
+      icon: <LogoutOutlined />,
+      onClick: handleMenuClick,
+    },
+  ];
 
   return (
     <div
@@ -36,7 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       }}
     >
       <div style={{ fontSize: "1.2rem" }}>CRUD Recibos</div>
-      <Dropdown overlay={menu} trigger={["click"]}>
+      <Dropdown menu={{ items }} trigger={["click"]}>
         <Button type="text" style={{ color: "#fff" }}>
           <UserOutlined /> Usuario
         </Button>
