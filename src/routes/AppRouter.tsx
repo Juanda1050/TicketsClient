@@ -1,10 +1,8 @@
 // AppRouter.tsx
-import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import Login from "../components/Login";
 import Register from "../components/Register";
-import Tickets from "../components/Tickets";
 import Unauthorized from "../components/Unauthorized";
 
 const AppRouter = () => {

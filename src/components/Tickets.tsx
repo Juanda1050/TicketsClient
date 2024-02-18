@@ -120,10 +120,6 @@ const RecordsTable: React.FC = () => {
     setModalVisible(false);
   };
 
-  const handleLogout = () => {
-    console.log("Cerrar sesión");
-  };
-
   const columns = [
     {
       title: "No. Registro",
@@ -203,7 +199,7 @@ const RecordsTable: React.FC = () => {
     <Spin spinning={isLoading || isFetching}>
       <Row gutter={[0, 16]}>
         <Col span={24}>
-          <Navbar onLogout={handleLogout} />
+          <Navbar />
         </Col>
         <Col span={24}>
           <Row justify="space-between">

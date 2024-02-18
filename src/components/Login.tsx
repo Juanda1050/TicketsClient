@@ -1,13 +1,30 @@
-import { Button, Card, Form, Input, Typography } from "antd";
+import { Button, Card, Form, Input, Typography, message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useAuth } from "./context/AuthProvider";
+import { ILogin } from "../model/User";
+import { loginUser } from "../api/user";
+import { useNavigate } from "react-router-dom";
 
 const { Text, Title, Link } = Typography;
 
 const Login = () => {
   const { login } = useAuth();
-  const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
+  const navigate = useNavigate();
+
+  const onFinish = async (values: ILogin) => {
+    try {
+      const response = await loginUser(values);
+      if (response.token !== "") {
+        login(response.token, response.usuarioId);
+        navigate("/home");
+      } else {
+        message.error("El usuario no existe.");
+      }
+    } catch (error) {
+      message.error(
+        "Error al iniciar sesión. Por favor, inténtalo de nuevo más tarde."
+      );
+    }
   };
 
   return (
@@ -27,7 +44,7 @@ const Login = () => {
             a continuación para iniciar sesión.
           </Text>
         </div>
-        <Form
+        <Form<ILogin>
           name="normal_login"
           initialValues={{
             remember: true,
@@ -41,7 +58,6 @@ const Login = () => {
             name="nombre"
             rules={[
               {
-                type: "email",
                 required: true,
                 message: "¡Por favor ingresa tu usuario!",
               },

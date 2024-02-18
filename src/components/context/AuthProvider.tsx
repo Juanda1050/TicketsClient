@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -6,19 +12,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [authState, setAuthState] = useState<{
     token: string | null;
-    userId: string | null;
+    usuarioId: string | null;
   }>({
-    token: null,
-    userId: null,
+    token: localStorage.getItem("token"),
+    usuarioId: localStorage.getItem("usuarioId"),
   });
 
-  const login = (token: string, userId: string) => {
-    setAuthState({ token, userId });
+  const login = (token: string, usuarioId: string) => {
+    setAuthState({ token, usuarioId });
+    localStorage.setItem("token", token);
+    localStorage.setItem("usuarioId", usuarioId);
   };
 
   const logout = () => {
-    setAuthState({ token: null, userId: null });
+    setAuthState({ token: null, usuarioId: null });
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuarioId");
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const usuarioId = localStorage.getItem("usuarioId");
+    if (token && usuarioId) {
+      setAuthState({ token, usuarioId });
+    }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ ...authState, login, logout }}>

@@ -10,8 +10,8 @@ const { Text, Title, Link } = Typography;
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
-const Register = () => {
-  //   const navigate = useNavigate();
+const Register: React.FC = () => {
+  const navigate = useNavigate();
   const errRef = useRef<HTMLDivElement>(null);
 
   const [user, setUser] = useState("");
@@ -34,6 +34,7 @@ const Register = () => {
       setMatchPassword("");
 
       message.success(response.message);
+      navigate("/login");
     } else {
       message.error(response.message);
       errRef.current?.focus && errRef.current.focus();

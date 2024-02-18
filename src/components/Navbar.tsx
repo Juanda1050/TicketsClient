@@ -1,19 +1,31 @@
-import React from "react";
-import { Dropdown, Button, message, MenuProps } from "antd";
+import React, { useState } from "react";
+import { Dropdown, Button, message, Modal, MenuProps } from "antd";
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { useAuth } from "./context/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
-interface NavbarProps {
-  onLogout: () => void;
-}
+const Navbar: React.FC = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
-const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const handleLogout = () => {
-    onLogout();
+    logout();
+    navigate("/");
+    message.info("Sesión cerrada exitosamente");
   };
 
-  const handleMenuClick = (e: any) => {
-    message.info("Cerrando sesión");
-    console.log("click", e);
+  const showLogoutModal = () => {
+    setLogoutModalVisible(true);
+  };
+
+  const handleLogoutConfirmed = () => {
+    handleLogout();
+    setLogoutModalVisible(false);
+  };
+
+  const handleLogoutCancelled = () => {
+    setLogoutModalVisible(false);
   };
 
   const items: MenuProps["items"] = [
@@ -21,7 +33,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       label: "Cerrar sesión",
       key: "1",
       icon: <LogoutOutlined />,
-      onClick: handleMenuClick,
+      onClick: showLogoutModal,
     },
   ];
 
@@ -42,6 +54,17 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
           <UserOutlined /> Usuario
         </Button>
       </Dropdown>
+      <Modal
+        title="Cerrar sesión"
+        open={logoutModalVisible}
+        onOk={handleLogoutConfirmed}
+        onCancel={handleLogoutCancelled}
+        okText="Sí"
+        cancelText="Cancelar"
+        okButtonProps={{ danger: true }}
+      >
+        <p>¿Estás seguro de que quieres cerrar sesión?</p>
+      </Modal>
     </div>
   );
 };

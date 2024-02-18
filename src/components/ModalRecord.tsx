@@ -164,7 +164,7 @@ const ModalRecord: React.FC<ModalRecordProps> = ({
               { required: true, message: "Por favor selecciona la fecha" },
             ]}
             getValueProps={(i) => ({
-              value: action === "create" ? null : dayjs(i),
+              value: i ? dayjs(i) : null,
             })}
           >
             <CustomDatePicker

@@ -1,5 +1,5 @@
-import { IResponses } from "../model/Reponses";
-import { IRegister } from "../model/User";
+import { IResponseToken, IResponses } from "../model/Reponses";
+import { ILogin, IRegister } from "../model/User";
 import axiosInstance from "./axios";
 
 export const registerUser = async (
@@ -15,6 +15,21 @@ export const registerUser = async (
     return {
       message: error.response?.data?.message || "Error de servidor",
       isError: true,
+    };
+  }
+};
+
+export const loginUser = async (loginData: ILogin): Promise<IResponseToken> => {
+  try {
+    const response = await axiosInstance.post("/api/Users/login", loginData); // Cambia la URL del endpoint según corresponda
+    return {
+      token: response.data.token,
+      usuarioId: response.data.usuarioId,
+    };
+  } catch (error: any) {
+    return {
+      token: "",
+      usuarioId: "",
     };
   }
 };
