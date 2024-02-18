@@ -1,6 +1,7 @@
 import { message } from "antd";
 import { ITicket } from "../model/Ticket";
 import axiosInstance from "./axios";
+import { useMutation, useQueryClient } from "react-query";
 
 export const createTicket = async (ticket: ITicket): Promise<ITicket> => {
   try {
@@ -37,7 +38,7 @@ export const deleteTicket = async (id: number): Promise<boolean> => {
   } catch (error: any) {
     if (error.response && error.response.status === 401) {
       message.error("No tiene permisos para realizar esta tarea.");
-    }else {
+    } else {
       message.error("Error al eliminar el registro.");
     }
     return false;
@@ -70,4 +71,19 @@ export const getAllTickets = async (): Promise<ITicket[]> => {
     }
     return error;
   }
+};
+export const useDeleteTicketMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    async (id: number) => {
+      await deleteTicket(id);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("all");
+        message.success("Registro eliminado exitosamente");
+      },
+    }
+  );
 };

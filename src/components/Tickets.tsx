@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Col,
@@ -23,9 +23,11 @@ import {
   getAllTickets,
   getTicketById,
   updateTicket,
+  useDeleteTicketMutation,
 } from "../api/tickets";
 import { ITicket } from "../model/Ticket";
 import dayjs from "dayjs";
+import { useQuery } from "react-query";
 
 const RecordsTable: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -33,72 +35,43 @@ const RecordsTable: React.FC = () => {
   const [modalAction, setModalAction] = useState<"create" | "edit" | "view">(
     "create"
   );
-  const [loading, setLoading] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<ITicket | undefined>(
     undefined
   );
+  const mutation = useDeleteTicketMutation();
 
-  useEffect(() => {
-    handleFilter();
-  }, []);
+  const { isLoading, data, isFetching, refetch } = useQuery(
+    "all",
+    getAllTickets
+  );
 
   const handleNewRecord = () => {
     setModalVisible(true);
     setModalAction("create");
   };
 
-  const handleFilter = async () => {
-    setLoading(true);
-
-    try {
-      const response = await getAllTickets();
-
-      setDataSource(response);
-    } catch (error) {
-      message.error("Error al filtrar los recibos.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleExistingRecord = async (record: ITicket) => {
-    const response = await getTicketById(record.id);
-
-    if (response) {
-      setSelectedRecord(response);
-      setModalVisible(true);
-      setModalAction("edit");
-    }
+    setSelectedRecord(record);
+    setModalVisible(true);
+    setModalAction("edit");
   };
 
-  const handleViewRecord = async (record: ITicket) => {
-    const response = await getTicketById(record.id);
-    const ticketData = dayjs(response.fecha, "YYYY-MM-DDTHH:mm:ss.SSS");
-    response.fecha = ticketData;
-
-    if (response) {
+  const handleViewRecord = (record: ITicket) => {
+    try {
       setSelectedRecord(record);
-      setModalVisible(true);
       setModalAction("view");
+      setModalVisible(true);
+    } catch (error) {
+      console.error("Error al obtener el ticket:", error);
     }
   };
 
-  // const handleOk = (values: any) => {
-  //   const newRecord = {
-  //     key: dataSource.length + 1,
-  //     amount: values.amount,
-  //     provider: values.provider,
-  //     comment: values.comment,
-  //     date: values.date.format("YYYY-MM-DD"),
-  //   };
-  //   setDataSource([...dataSource, newRecord]);
-  //   setModalVisible(false);
-  // };
+  const handleDelete = (id: number) => {
+    mutation.mutate(id);
+  };
 
   const handleOk = async (values: ITicket) => {
     if (modalAction !== "view") {
-      setLoading(true); // Activar el estado de carga
-
       try {
         const response =
           modalAction === "create"
@@ -112,8 +85,6 @@ const RecordsTable: React.FC = () => {
         }
       } catch (error) {
         message.error("Error al crear el recibo.");
-      } finally {
-        setLoading(false); // Desactivar el estado de carga, ya sea que haya sido exitosa o no la petición
       }
     }
   };
@@ -189,7 +160,7 @@ const RecordsTable: React.FC = () => {
           />
           <Popconfirm
             title="¿Estás seguro de eliminar este registro?"
-            onConfirm={() => console.log("Registro eliminado")}
+            onConfirm={() => handleDelete(record.id)}
             okText="Sí"
             cancelText="No"
           >
@@ -202,7 +173,7 @@ const RecordsTable: React.FC = () => {
   ];
 
   return (
-    <Spin spinning={loading}>
+    <Spin spinning={isLoading || isFetching}>
       <Row gutter={[0, 16]}>
         <Col span={24}>
           <Navbar onLogout={handleLogout} />
@@ -219,7 +190,7 @@ const RecordsTable: React.FC = () => {
             <Button
               type="primary"
               icon={<SearchOutlined />}
-              onClick={handleFilter}
+              onClick={() => refetch()}
             >
               Filtrar
             </Button>
@@ -228,7 +199,7 @@ const RecordsTable: React.FC = () => {
         <Col span={24}>
           <Table<ITicket>
             rowKey={(record) => record.id}
-            dataSource={dataSource}
+            dataSource={data}
             columns={columns}
             style={{ borderRadius: "8px" }}
             bordered

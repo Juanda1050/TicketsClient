@@ -1,9 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Modal, Form, Input, DatePicker, Select, InputNumber } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  Select,
+  InputNumber,
+  Spin,
+  message,
+} from "antd";
 import currencies, { Currency } from "../utils/Currency";
 import { ITicket } from "../model/Ticket";
 import { getCurrencySymbol } from "../utils/CurrencySymbols";
 import dayjs from "dayjs";
+import { getTicketById } from "../api/tickets";
+import { useQueryClient } from "react-query";
 
 const { Option } = Select;
 
@@ -26,8 +37,21 @@ const ModalRecord: React.FC<ModalRecordProps> = ({
 }) => {
   const [form] = Form.useForm<ITicket>();
   const [currencySymbol, setCurrencySymbol] = useState("");
-
+  const queryClient = useQueryClient();
   const prevVisibleRef = useRef<boolean>();
+
+  const handleViewRecord = async (record: ITicket) => {
+    try {
+      const ticketData = await queryClient.fetchQuery(
+        ["ticket", record.id],
+        () => getTicketById(record.id)
+      );
+      if (ticketData && visible) form.setFieldsValue(ticketData);
+      else form.resetFields();
+    } catch (error) {
+      message.error("Error al obtener el ticket: " + error);
+    }
+  };
 
   useEffect(() => {
     prevVisibleRef.current = visible;
@@ -39,14 +63,14 @@ const ModalRecord: React.FC<ModalRecordProps> = ({
     if (!visible && prevVisible) {
       form.resetFields();
       setCurrencySymbol("");
-    }
-    if (record) {
+    } else if (record && action !== "create") {
       handleCurrencyChange(record.moneda);
+      handleViewRecord(record);
     }
-  }, [visible, prevVisible, form]);
+  }, [visible, prevVisible, record, action]);
 
   const handleOk = async () => {
-    if (action === "create") {
+    if (action !== "view") {
       const values = await form.validateFields();
       onOk(values);
       form.resetFields();
@@ -75,77 +99,89 @@ const ModalRecord: React.FC<ModalRecordProps> = ({
       okButtonProps={{ style: { display: action === "view" ? "none" : "" } }}
       cancelButtonProps={{ type: action === "view" ? "primary" : "default" }}
     >
-      <Form<ITicket>
-        name="tickets_form"
-        form={form}
-        layout="vertical"
-        initialValues={record}
-      >
-        <Form.Item
-          label="Monto"
-          name="monto"
-          rules={[{ required: true, message: "Por favor ingresa el monto" }]}
-        >
-          <InputNumber
-            key={currencySymbol}
-            disabled={action === "view"}
-            style={{ width: "100%" }}
-            placeholder="Ingrese monto"
-            formatter={(value) =>
-              `${currencySymbol} ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            }
-          />
-        </Form.Item>
-        <Form.Item
-          label="Moneda"
-          name="moneda"
-          rules={[
-            { required: true, message: "Por favor selecciona la moneda" },
-          ]}
-        >
-          <Select
-            disabled={action === "view"}
-            style={{ width: "100%" }}
-            placeholder="Seleccione una divisa"
-            showSearch
-            onChange={handleCurrencyChange}
+      <Spin spinning={false}>
+        <Form<ITicket> name="tickets_form" form={form} layout="vertical">
+          <Form.Item
+            label="No. registro"
+            name="id"
+            hidden={true}
           >
-            {currencies.map((currency: Currency) => (
-              <Option key={currency.code} value={currency.code}>
-                {currency.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
-          label="Proveedor"
-          name="proveedor"
-          rules={[
-            { required: true, message: "Por favor ingresa el proveedor" },
-          ]}
-        >
-          <Input disabled={action === "view"} placeholder="Ingrese proveedor" />
-        </Form.Item>
-        <Form.Item label="Comentario" name="comentario">
-          <Input.TextArea
-            disabled={action === "view"}
-            placeholder="Ingrese comentario"
-          />
-        </Form.Item>
-        <Form.Item
-          label="Fecha"
-          name="fecha"
-          rules={[{ required: true, message: "Por favor selecciona la fecha" }]}
-          getValueProps={(i) => ({ value: dayjs(i) })}
-        >
-          <DatePicker
-            style={{ width: "100%" }}
-            disabled={action === "view"}
-            format={dateFormat}
-            placeholder="Seleccione una fecha"
-          />
-        </Form.Item>
-      </Form>
+            <Input disabled={true} />
+          </Form.Item>
+          <Form.Item
+            label="Monto"
+            name="monto"
+            rules={[{ required: true, message: "Por favor ingresa el monto" }]}
+          >
+            <InputNumber
+              key={currencySymbol}
+              disabled={action === "view"}
+              style={{ width: "100%" }}
+              placeholder="Ingrese monto"
+              formatter={(value) =>
+                `${currencySymbol} ${value}`.replace(
+                  /\B(?=(\d{3})+(?!\d))/g,
+                  ","
+                )
+              }
+            />
+          </Form.Item>
+          <Form.Item
+            label="Moneda"
+            name="moneda"
+            rules={[
+              { required: true, message: "Por favor selecciona la moneda" },
+            ]}
+          >
+            <Select
+              disabled={action === "view"}
+              style={{ width: "100%" }}
+              placeholder="Seleccione una divisa"
+              showSearch
+              onChange={handleCurrencyChange}
+            >
+              {currencies.map((currency: Currency) => (
+                <Option key={currency.code} value={currency.code}>
+                  {currency.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Proveedor"
+            name="proveedor"
+            rules={[
+              { required: true, message: "Por favor ingresa el proveedor" },
+            ]}
+          >
+            <Input
+              disabled={action === "view"}
+              placeholder="Ingrese proveedor"
+            />
+          </Form.Item>
+          <Form.Item label="Comentario" name="comentario">
+            <Input.TextArea
+              disabled={action === "view"}
+              placeholder="Ingrese comentario"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Fecha"
+            name="fecha"
+            rules={[
+              { required: true, message: "Por favor selecciona la fecha" },
+            ]}
+            getValueProps={(i) => ({ value: dayjs(i) })}
+          >
+            <DatePicker
+              style={{ width: "100%" }}
+              disabled={action === "view"}
+              format={dateFormat}
+              placeholder="Seleccione una fecha"
+            />
+          </Form.Item>
+        </Form>
+      </Spin>
     </Modal>
   );
 };
