@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Col,
-  DatePicker,
   Popconfirm,
   Row,
   Space,
   Spin,
   Table,
   message,
+  Typography,
 } from "antd";
 import Navbar from "./Navbar";
 import ModalRecord from "./ModalRecord";
@@ -17,7 +17,6 @@ import {
   DeleteOutlined,
   EyeOutlined,
   PlusOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
 import {
   getAllTickets,
@@ -30,6 +29,8 @@ import dayjs from "dayjs";
 import { useQuery } from "react-query";
 import CustomDatePicker from "./CustomPicker";
 
+const { Text } = Typography;
+
 const RecordsTable: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalAction, setModalAction] = useState<"create" | "edit" | "view">(
@@ -38,13 +39,22 @@ const RecordsTable: React.FC = () => {
   const [selectedRecord, setSelectedRecord] = useState<ITicket | undefined>(
     undefined
   );
+  const [filterDate, setFilterDate] = useState<dayjs.Dayjs | undefined>(
+    undefined
+  );
+
   const addMutation = useAddTicketMutation();
   const updateMutation = useUpdateTicketMutation();
   const deleteMutation = useDeleteTicketMutation();
 
+  useEffect(() => {
+    refetch();
+  }, []);
+
   const { isLoading, data, isFetching, refetch } = useQuery(
-    "all",
-    getAllTickets
+    ["all", filterDate],
+    () => getAllTickets(filterDate),
+    { enabled: filterDate !== undefined }
   );
 
   const handleNewRecord = () => {
@@ -208,18 +218,19 @@ const RecordsTable: React.FC = () => {
             </Col>
             <Col>
               <Space>
+                <Text>Filtrar por Fecha: </Text>
                 <CustomDatePicker
                   placeholder="Fecha"
-                  // value={filterDate}
-                  // onChange={(date) => setFilterDate(date)}
+                  value={filterDate}
+                  onChange={(date) => setFilterDate(date)}
                 />
-                <Button
+                {/* <Button
                   type="primary"
                   icon={<SearchOutlined />}
                   onClick={() => refetch()}
                 >
                   Filtrar
-                </Button>
+                </Button> */}
               </Space>
             </Col>
           </Row>

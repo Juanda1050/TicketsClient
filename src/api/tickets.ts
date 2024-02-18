@@ -2,6 +2,7 @@ import { message } from "antd";
 import { ITicket } from "../model/Ticket";
 import axiosInstance from "./axios";
 import { useMutation, useQueryClient } from "react-query";
+import dayjs from "dayjs";
 
 export const createTicket = async (ticket: ITicket): Promise<ITicket> => {
   try {
@@ -59,9 +60,13 @@ export const getTicketById = async (id: number): Promise<ITicket> => {
   }
 };
 
-export const getAllTickets = async (): Promise<ITicket[]> => {
+export const getAllTickets = async (date?: dayjs.Dayjs): Promise<ITicket[]> => {
   try {
-    const response = await axiosInstance.get("/api/Tickets");
+    let url = "/api/Tickets";
+    if (date) {
+      url += `?fromDate=${date.toISOString()}`;
+    }
+    const response = await axiosInstance.get(url);
     return response.data;
   } catch (error: any) {
     if (error.response && error.response.status === 401) {
@@ -69,11 +74,10 @@ export const getAllTickets = async (): Promise<ITicket[]> => {
     } else {
       message.error("Error al filtrar los recibos.");
     }
-    return error;
+    return [];
   }
 };
 
-// const queryClient = useQueryClient();
 
 export const useAddTicketMutation = () => {
   const queryClient = useQueryClient();

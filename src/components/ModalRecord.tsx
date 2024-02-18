@@ -32,12 +32,13 @@ const ModalRecord: React.FC<ModalRecordProps> = ({
 
   const handleViewRecord = async (record: ITicket) => {
     try {
-      const ticketData = await queryClient.fetchQuery(
-        ["ticket", record.id],
-        () => getTicketById(record.id)
-      );
-      if (ticketData && visible) form.setFieldsValue(ticketData);
-      else form.resetFields();
+      if (visible) {
+        const ticketData = await queryClient.fetchQuery(
+          ["ticket", record.id],
+          () => getTicketById(record.id)
+        );
+        if (ticketData) form.setFieldsValue(ticketData);
+      } else form.resetFields();
     } catch (error) {
       message.error("Error al obtener el ticket: " + error);
     }
