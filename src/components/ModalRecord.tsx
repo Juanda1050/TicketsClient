@@ -1,20 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  Select,
-  InputNumber,
-  Spin,
-  message,
-} from "antd";
+import { Modal, Form, Input, Select, InputNumber, Spin, message } from "antd";
 import currencies, { Currency } from "../utils/Currency";
 import { ITicket } from "../model/Ticket";
 import { getCurrencySymbol } from "../utils/CurrencySymbols";
 import dayjs from "dayjs";
 import { getTicketById } from "../api/tickets";
 import { useQueryClient } from "react-query";
+import CustomDatePicker from "./CustomPicker";
 
 const { Option } = Select;
 
@@ -23,10 +15,8 @@ interface ModalRecordProps {
   record: ITicket | undefined;
   action: "create" | "edit" | "view";
   onCancel: () => void;
-  onOk: (values: any) => void;
+  onOk: (values: ITicket) => void;
 }
-
-const dateFormat = "DD/MM/YYYY";
 
 const ModalRecord: React.FC<ModalRecordProps> = ({
   visible,
@@ -101,11 +91,7 @@ const ModalRecord: React.FC<ModalRecordProps> = ({
     >
       <Spin spinning={false}>
         <Form<ITicket> name="tickets_form" form={form} layout="vertical">
-          <Form.Item
-            label="No. registro"
-            name="id"
-            hidden={true}
-          >
+          <Form.Item label="No. registro" name="id" hidden={true}>
             <Input disabled={true} />
           </Form.Item>
           <Form.Item
@@ -123,6 +109,11 @@ const ModalRecord: React.FC<ModalRecordProps> = ({
                   /\B(?=(\d{3})+(?!\d))/g,
                   ","
                 )
+              }
+              parser={(value) =>
+                value
+                  ? value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1")
+                  : ""
               }
             />
           </Form.Item>
@@ -171,13 +162,13 @@ const ModalRecord: React.FC<ModalRecordProps> = ({
             rules={[
               { required: true, message: "Por favor selecciona la fecha" },
             ]}
-            getValueProps={(i) => ({ value: dayjs(i) })}
+            getValueProps={(i) => ({
+              value: action === "create" ? null : dayjs(i),
+            })}
           >
-            <DatePicker
-              style={{ width: "100%" }}
-              disabled={action === "view"}
-              format={dateFormat}
+            <CustomDatePicker
               placeholder="Seleccione una fecha"
+              disabled={action === "view"}
             />
           </Form.Item>
         </Form>

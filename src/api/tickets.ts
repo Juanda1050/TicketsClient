@@ -11,7 +11,7 @@ export const createTicket = async (ticket: ITicket): Promise<ITicket> => {
     if (error.response && error.response.status === 401) {
       message.error("No tiene permisos para realizar esta tarea.");
     } else {
-      message.error("Error al crear el ticket.");
+      message.error("Error al crear el registro.");
     }
     return error;
   }
@@ -25,7 +25,7 @@ export const updateTicket = async (ticket: ITicket): Promise<ITicket> => {
     if (error.response && error.response.status === 401) {
       message.error("No tiene permisos para realizar esta tarea.");
     } else {
-      message.error("Error al crear el ticket.");
+      message.error("Error al actualizar el registro.");
     }
     return error;
   }
@@ -72,9 +72,51 @@ export const getAllTickets = async (): Promise<ITicket[]> => {
     return error;
   }
 };
-export const useDeleteTicketMutation = () => {
+
+// const queryClient = useQueryClient();
+
+export const useAddTicketMutation = () => {
   const queryClient = useQueryClient();
 
+  return useMutation<ITicket, unknown, ITicket>(
+    "addTicket",
+    async (ticket: ITicket) => {
+      const response = await createTicket(ticket);
+      return response;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("all");
+      },
+      onError: () => {
+        message.error("Error al crear el registro.");
+      },
+    }
+  );
+};
+
+export const useUpdateTicketMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<ITicket, unknown, ITicket>(
+    "updateTicket",
+    async (ticket: ITicket) => {
+      const response = await updateTicket(ticket);
+      return response;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("all");
+      },
+      onError: () => {
+        message.error("Error al actualizar el registro.");
+      },
+    }
+  );
+};
+
+export const useDeleteTicketMutation = () => {
+  const queryClient = useQueryClient();
   return useMutation(
     async (id: number) => {
       await deleteTicket(id);
@@ -83,6 +125,9 @@ export const useDeleteTicketMutation = () => {
       onSuccess: () => {
         queryClient.invalidateQueries("all");
         message.success("Registro eliminado exitosamente");
+      },
+      onError: () => {
+        message.error("Error al encontrar el registro.");
       },
     }
   );

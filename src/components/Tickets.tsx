@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   Button,
   Col,
+  DatePicker,
   Popconfirm,
   Row,
   Space,
@@ -19,26 +20,27 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import {
-  createTicket,
   getAllTickets,
-  getTicketById,
-  updateTicket,
+  useAddTicketMutation,
   useDeleteTicketMutation,
+  useUpdateTicketMutation,
 } from "../api/tickets";
 import { ITicket } from "../model/Ticket";
 import dayjs from "dayjs";
 import { useQuery } from "react-query";
+import CustomDatePicker from "./CustomPicker";
 
 const RecordsTable: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [dataSource, setDataSource] = useState<ITicket[]>([]);
   const [modalAction, setModalAction] = useState<"create" | "edit" | "view">(
     "create"
   );
   const [selectedRecord, setSelectedRecord] = useState<ITicket | undefined>(
     undefined
   );
-  const mutation = useDeleteTicketMutation();
+  const addMutation = useAddTicketMutation();
+  const updateMutation = useUpdateTicketMutation();
+  const deleteMutation = useDeleteTicketMutation();
 
   const { isLoading, data, isFetching, refetch } = useQuery(
     "all",
@@ -67,25 +69,40 @@ const RecordsTable: React.FC = () => {
   };
 
   const handleDelete = (id: number) => {
-    mutation.mutate(id);
+    deleteMutation.mutate(id);
+  };
+
+  const handleCreate = async (values: ITicket) => {
+    try {
+      const response = await addMutation.mutateAsync(values);
+
+      if (response.id > 0) {
+        message.success("Registro creado exitosamente.");
+        setModalVisible(false);
+      }
+    } catch (error) {
+      message.error("Error al crear el recibo.");
+    }
+  };
+
+  const handleUpdate = async (values: ITicket) => {
+    try {
+      const updatedTicket = await updateMutation.mutateAsync(values);
+
+      if (updatedTicket) {
+        message.success("Registro actualizado exitosamente.");
+        setModalVisible(false);
+      }
+    } catch (error) {
+      message.error("Error al actualizar el recibo.");
+    }
   };
 
   const handleOk = async (values: ITicket) => {
     if (modalAction !== "view") {
-      try {
-        const response =
-          modalAction === "create"
-            ? await createTicket(values)
-            : await updateTicket(values);
-
-        if (response.id > 0) {
-          setDataSource([...dataSource, response]);
-          message.success("Recibo cargado exitosamente.");
-          setModalVisible(false);
-        }
-      } catch (error) {
-        message.error("Error al crear el recibo.");
-      }
+      modalAction === "create"
+        ? await handleCreate(values)
+        : await handleUpdate(values);
     }
   };
 
@@ -179,22 +196,33 @@ const RecordsTable: React.FC = () => {
           <Navbar onLogout={handleLogout} />
         </Col>
         <Col span={24}>
-          <Space>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleNewRecord}
-            >
-              Nuevo
-            </Button>
-            <Button
-              type="primary"
-              icon={<SearchOutlined />}
-              onClick={() => refetch()}
-            >
-              Filtrar
-            </Button>
-          </Space>
+          <Row justify="space-between">
+            <Col>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleNewRecord}
+              >
+                Nuevo
+              </Button>
+            </Col>
+            <Col>
+              <Space>
+                <CustomDatePicker
+                  placeholder="Fecha"
+                  // value={filterDate}
+                  // onChange={(date) => setFilterDate(date)}
+                />
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  onClick={() => refetch()}
+                >
+                  Filtrar
+                </Button>
+              </Space>
+            </Col>
+          </Row>
         </Col>
         <Col span={24}>
           <Table<ITicket>
