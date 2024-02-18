@@ -1,9 +1,11 @@
 import { Button, Card, Form, Input, Typography } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { useAuth } from "./context/AuthProvider";
 
 const { Text, Title, Link } = Typography;
 
 const Login = () => {
+  const { login } = useAuth();
   const onFinish = (values: any) => {
     console.log("Received values of form: ", values);
   };
@@ -33,6 +35,7 @@ const Login = () => {
           onFinish={onFinish}
           layout="vertical"
           requiredMark="optional"
+          autoComplete="off"
         >
           <Form.Item
             name="nombre"
@@ -67,7 +70,7 @@ const Login = () => {
             </Button>
             <div style={{ marginTop: "1rem", textAlign: "center" }}>
               <Text>¿Aún no tienes cuenta?</Text>{" "}
-              <Link href="">Registrarse</Link>
+              <Link href="/register">Registrarse</Link>
             </div>
           </Form.Item>
         </Form>

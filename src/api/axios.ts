@@ -1,17 +1,24 @@
-import axios, { AxiosInstance } from "axios";
+import axios from "axios";
 
-const baseURL: string | undefined = "https://localhost:7249/";
+const baseURL = process.env.REACT_APP_DEV_URL;
 
-if (!baseURL) {
-  throw new Error("La variable de entorno REACT_APP_DEV_URL no está definida");
-}
-
-const axiosInstance: AxiosInstance = axios.create({
-  baseURL: baseURL,
-  timeout: 30000,
-  headers: {
-    "Content-Type": "application/json",
-  },
+const axiosInstance = axios.create({
+  baseURL,
 });
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default axiosInstance;

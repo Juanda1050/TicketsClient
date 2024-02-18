@@ -141,7 +141,7 @@ const Register = () => {
             </Button>
             <div style={{ marginTop: "1rem", textAlign: "center" }}>
               <Text>¿Ya tienes cuenta?</Text>{" "}
-              <Link href="">Iniciar sesión</Link>
+              <Link href="/">Iniciar sesión</Link>
             </div>
           </Form.Item>
         </Form>

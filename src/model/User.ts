@@ -8,3 +8,8 @@ export interface IRegister {
   contraseña: string;
   confirmar_contraseña: string;
 }
+
+export interface ILogin {
+  nombre: string;
+  contraseña: string;
+}
