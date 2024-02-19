@@ -5,7 +5,7 @@ import { ILogin } from "../model/User";
 import { loginUser } from "../api/user";
 import { useNavigate } from "react-router-dom";
 
-const { Text, Title, Link } = Typography;
+const { Text, Title } = Typography;
 
 const Login = () => {
   const { login } = useAuth();
