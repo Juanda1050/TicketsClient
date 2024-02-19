@@ -86,7 +86,9 @@ const Login = () => {
             </Button>
             <div style={{ marginTop: "1rem", textAlign: "center" }}>
               <Text>¿Aún no tienes cuenta?</Text>{" "}
-              <Link href="/register">Registrarse</Link>
+              <Button type="link" onClick={() => navigate("/register")}>
+                Registrarse
+              </Button>
             </div>
           </Form.Item>
         </Form>
