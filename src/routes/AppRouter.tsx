@@ -13,8 +13,7 @@ const AppRouter = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/home" element={<PrivateRoute />} />
-      <Route path="/not-found" element={<NotFound />} />
-      <Route path="*" element={<Navigate to="/not-found" />} />
+      <Route path="/*" element={<NotFound />} />
       <Route path="/" element={<Navigate to="/login" />} />
     </Routes>
   );
