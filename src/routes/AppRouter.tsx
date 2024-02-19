@@ -14,6 +14,7 @@ const AppRouter = () => {
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/home" element={<PrivateRoute />} />
       <Route path="/*" element={<NotFound />} />
+      <Route path="*" element={<Navigate to="/not-found" />} />
       <Route path="/" element={<Navigate to="/login" />} />
     </Routes>
   );

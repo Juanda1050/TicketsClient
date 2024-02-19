@@ -7,8 +7,8 @@ const NotFound = () => {
 
   return (
     <Result
-      status="403"
-      title="403 Forbidden"
+      status="404"
+      title="404 Not Found"
       subTitle="No tienes permiso para acceder a esta página."
       extra={
         token ? (
